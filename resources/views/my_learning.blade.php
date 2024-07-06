@@ -104,9 +104,10 @@
                                             <div class="col-6">
                                                 <a href="#">{{ $course->CategoryName }}</a>
                                             </div>
-                                            <div class="col-6 text-end">
-                                                <div class="price">${{ $course->Price }}</div>
+                                            <div  class="col-6 text-end">
+                                                <a   href="{{ route('learning.course', ['course_id' => $course->CourseID]) }}" class="btn btn-primary">Start</a>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>

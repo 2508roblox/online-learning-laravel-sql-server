@@ -250,3 +250,22 @@ Route::get('/checkout/{course_id}', function ($course_id ) {
         'course' => $courseDetails
     ]);
 })->name('checkout');
+
+Route::get('/learning/{course_id}', function ($course_id) {
+    // Check if the user has purchased the course or has access to it
+    // You may need to implement your own logic here to check if the user has access
+
+    // For demonstration purposes, assume the user has access
+    $course = DB::select('EXEC GetCourseDetailsById ' . $course_id);
+    if (!$course) {
+        abort(404); // Xử lý khi không tìm thấy course
+    }
+
+    if (empty($course)) {
+        return redirect()->back()->with('error', 'Course not found.');
+    }
+
+    return view('learning', [
+        'course' => $course // Assuming you retrieve the course details from database
+    ]);
+})->name('learning.course');
