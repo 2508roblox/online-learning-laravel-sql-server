@@ -9,7 +9,78 @@ use App\Models\Subcategory;
 use App\Models\Topic;
 use App\Models\User;
 use App\Models\Enrollment;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+Route::get('/instructor/dashboard', function () {
+    return view('instructor.dashboard');
+})->name('instructor.dashboard');
+
+Route::get('/instructor/courses', function () {
+    return view('instructor.courses');
+})->name('instructor.courses');
+
+Route::get('/instructor/courses/{id}/edit', function ($id) {
+    // Fetch the course data based on the id and pass it to the view
+    $course = \App\Models\Course::find($id);
+    return view('instructor.edit_course', ['course' => $course]);
+})->name('instructor.courses.edit');
+
+Route::get('/instructor/profile', function () {
+    // Fetch the instructor data based on the authenticated user and pass it to the view
+    $instructor = \Auth::user();
+    return view('instructor.profile', ['instructor' => $instructor]);
+})->name('instructor.profile');
+
+Route::get('/instructor/profile/edit', function () {
+    // Fetch the instructor data based on the authenticated user and pass it to the view
+    $instructor = \Auth::user();
+    return view('instructor.edit_profile', ['instructor' => $instructor]);
+})->name('instructor.profile.edit');
+Route::get('/instructor/courses/create', function () {
+    $topics = DB::select('SELECT [TopicID], [Name] FROM [online_learning].[dbo].[Topics]');
+    // Pass the topics to the view
+    return view('instructor.create_course', ['topics' => $topics]);
+})->name('instructor.courses.create');
+Route::post('/instructor/courses', function (Request $request) {
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'category' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        // Thêm các validation khác nếu cần thiết
+    ]);
+
+    // Tạo course mới
+    \App\Models\Course::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'category' => $request->category,
+        'price' => $request->price,
+        'instructor_id' => \Auth::id(), // Lấy ID của instructor hiện tại
+        // Thêm các trường khác nếu cần thiết
+    ]);
+
+    return redirect()->route('instructor.courses')->with('success', 'Course created successfully.');
+})->name('instructor.courses.store');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Home route
 Route::get('/', function () {
@@ -22,6 +93,8 @@ Route::get('/', function () {
     // +"CourseCount": "0"getCategoryById
     return view('home', compact('courses', 'categories'));
 })->name('home');
+
+
 Route::get('/category/{id}', function ($id) {
     $category = DB::select('EXEC getCategoryById ' . $id);
     if (!$category) {
@@ -108,18 +181,46 @@ Route::get('/register', function () {
 })->name('register');
 
 Route::post('/register', function (Request $request) {
-        $categories = DB::select('EXEC GetCategoriesWithCourseCountByTopic');
-
     $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
+        'username' => 'required|string|max:50',
         'password' => 'required|string|min:8|confirmed',
+        'email' => 'required|string|email|max:100',
+        'fullname' => 'required|string|max:100',
+        'birthday' => 'required|date',
+        'gender' => 'required|in:M,F',
+        'address' => 'required|string|max:255',
+        'phone' => 'required|string|max:15',
     ]);
 
+    $hashedPassword = Hash::make($request->password);
 
+    DB::statement('EXEC CreateUser
+        @Username = ?,
+        @Password = ?,
+        @Email = ?,
+        @FullName = ?,
+        @Birthday = ?,
+        @Gender = ?,
+        @Address = ?,
+        @Phone = ?,
+        @ProfilePicture = ?,
+        @UserType = ?',
+        [
+            $request->username,
+            $hashedPassword,
+            $request->email,
+            $request->fullname,
+            $request->birthday,
+            $request->gender,
+            $request->address,
+            $request->phone,
+            'default.png', // Default profile picture
+            'L' // User type Learner
+        ]
+    );
 
     return redirect()->route('login')->with('success', 'Registration successful. Please login.');
-});
+})->name('register');
 
 Route::get('/login', function () {
         $categories = DB::select('EXEC GetCategoriesWithCourseCountByTopic');
@@ -127,21 +228,41 @@ Route::get('/login', function () {
     return view('login', compact('categories'));
 })->name('login');
 
+
+
 Route::post('/login', function (Request $request) {
     $credentials = $request->validate([
-        'email' => 'required|string|email',
-        'password' => 'required|string',
+        'username' => 'required|string|max:50',
+        'password' => 'required|string|min:8',
     ]);
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return redirect()->intended('dashboard');
+    // Call the stored procedure to get the user details
+    $user = DB::select('EXEC GetUserByUsername @Username = ?', [$credentials['username']]);
+
+    if ($user && Hash::check($credentials['password'], $user[0]->Password)) {
+        // Assuming the stored procedure returns user information if successful
+
+        // Manually setting session data
+        $request->session()->put('user_id', $user[0]->UserID);
+        $request->session()->put('username', $user[0]->Username);
+        $request->session()->put('email', $user[0]->Email);
+
+        // Check user type
+        if ($user[0]->UserType == 'I') {
+            // If user is instructor, redirect to instructor dashboard
+            return redirect()->route('instructor.dashboard');
+        } else {
+            // Otherwise, redirect to default home/dashboard route
+            return redirect('/');
+        }
     }
 
     return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ])->onlyInput('email');
-});
+        'username' => 'The provided credentials do not match our records.',
+    ])->onlyInput('username');
+})->name('login');
+
+
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
@@ -183,24 +304,43 @@ Route::post('/instructor/register', function (Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8|confirmed',
-        'resume' => 'required|mimes:pdf,doc,docx|max:2048',
+        'password' => 'required|string|min:8|confirmed'
     ]);
 
-    $resumePath = $request->file('resume')->store('resumes');
+    // Store the uploaded resume
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'resume' => $resumePath,
-        'role' => 'instructor', // Assuming you have a role column to differentiate users
-    ]);
+    // Hash the password
+    $hashedPassword = Hash::make($request->password);
 
-    Auth::login($user);
+    // Execute stored procedure to create instructor
+    DB::statement('EXEC CreateUser
+        @Username = ?,
+        @Password = ?,
+        @Email = ?,
+        @FullName = ?,
+        @Birthday = ?,
+        @Gender = ?,
+        @Address = ?,
+        @Phone = ?,
+        @ProfilePicture = ?,
+        @UserType = ?',
+        [
+            $request->name,
+            $hashedPassword,
+            $request->email,
+            $request->fullname,
+            $request->birthday,
+            $request->gender,
+            $request->address,
+            $request->phone,
+            'default.png', // Default profile picture
+            'I' // User type Instructor
+        ]
+    );
 
-    return redirect()->route('home')->with('success', 'Registration successful. Welcome, instructor!');
-});
+    // Redirect to login with success message
+    return redirect()->route('login')->with('success', 'Registration successful. Please login.');
+})->name('instructor.register');
 Route::get('/instructor/{id}', function ($id) {
     // Retrieve the instructor's information from the database
     $instructorWithCourses = DB::select('EXEC GetInstructorDetailsWithCoursesAndCategories 1');
@@ -269,3 +409,5 @@ Route::get('/learning/{course_id}', function ($course_id) {
         'course' => $course // Assuming you retrieve the course details from database
     ]);
 })->name('learning.course');
+
+

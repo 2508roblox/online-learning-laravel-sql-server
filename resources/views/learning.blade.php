@@ -195,7 +195,7 @@
                                             <ul>
                                                 @foreach($sectionItems as $item)
 
-                                                    <li>
+                                                    <li class="curriculum-item p-1 cursor-pointer">
                                                         <a   href="index.html" >
                                                             <i class="fa fa-play"></i>
                                                         </a>
@@ -236,6 +236,20 @@
 
 .play-btn:hover {
     transform: scale(1.1); /* Scale up on hover */
+}
+/* CSS */
+.curriculum-item {
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.curriculum-item:hover {
+    background-color: #f2f2f2; /* Màu nền khi hover */
+}
+
+.curriculum-item:hover p,
+.curriculum-item:hover span {
+    color: #666; /* Đổi màu chữ khi hover */
 }
 
 </style>

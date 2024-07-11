@@ -21,7 +21,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-xl-5">
-                    <form class="single-signin-form-wrap" method="POST" action=" ">
+                    <form class="single-signin-form-wrap" method="POST" action="{{ route('register') }}">
                         @csrf
                         <div class="single-input-wrap">
                             <input type="text" name="username" placeholder="Username" required>
@@ -54,6 +54,7 @@
                         <div class="single-input-wrap">
                             <input type="text" name="phone" placeholder="Phone" required>
                         </div>
+                        <input type="hidden" name="usertype" value="L">
                         <div class="single-checkbox-inner">
                             <input type="checkbox" required> By clicking "create account".
                         </div>
@@ -65,6 +66,7 @@
                             <a class="strong" href="{{ route('login') }}">Signin</a>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>

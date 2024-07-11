@@ -38,44 +38,44 @@
             <div class="nav-right-part nav-right-part-desktop">
                 <ul>
                     @auth
-                        <li><a href="#"><i class="fa fa-shopping-basket"></i></a></li>
-                        <li><a href="{{ route('login') }}">Log In</a></li>
-                        <li>
-                            <a href="{{ route('register') }}" class="btn btn-base-light">
-                                Sign Up
-                            </a>
-                        </li>
-                    @else
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                <img src="{{ Auth::user()->avatar ?? null }}" alt="Avatar" class="rounded-circle" width="30" height="30">
-                                {{ Auth::user()->name ?? "Người dùng 1" }}
-                            </a>
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            <img src="{{ Auth::user()->ProfilePicture ?? asset('default-avatar.png') }}" alt="Avatar" class="rounded-circle" width="30" height="30">
+                            {{ Auth::user()->FullName ?? "User" }}
+                        </a>
 
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('my.learning') }}">
-                                    My Learning
-                                </a>
-                                <a class="dropdown-item" href="{{ route('profile.show') }}">
-                                    Edit Profile
-                                </a>
-                                <a class="dropdown-item" href="{{ route('purchase.history') }}">
-                                    Purchase History
-                                </a>
-                                <hr>
-                                <a class="dropdown-item" href=" ">
-                                    Settings
-                                </a>
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                   onclick="event.preventDefault();
-                                                 document.getElementById('logout-form').submit();">
-                                    Logout
-                                </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('my.learning') }}">
+                                My Learning
+                            </a>
+                            <a class="dropdown-item" href="{{ route('profile.show') }}">
+                                Edit Profile
+                            </a>
+                            <a class="dropdown-item" href="{{ route('purchase.history') }}">
+                                Purchase History
+                            </a>
+                            <hr>
+                            <a class="dropdown-item" href=" ">
+                                Settings
+                            </a>
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
+                @else
+                    <li><a href="#"><i class="fa fa-shopping-basket"></i></a></li>
+                    <li><a href="{{ route('login') }}">Log In</a></li>
+                    <li>
+                        <a href="{{ route('register') }}" class="btn btn-base-light">
+                            Sign Up
+                        </a>
+                    </li>
+
                     @endguest
                 </ul>
             </div>

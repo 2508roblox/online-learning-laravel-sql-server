@@ -20,22 +20,23 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-5">
-                <form class="single-signin-form-wrap">
+                <form class="single-signin-form-wrap" method="POST" action="{{ route('login') }}">
+                    @csrf
                     <div class="single-input-wrap">
-                        <input type="text" placeholder="User Name">
+                        <input type="text" name="username" placeholder="Username" required>
                     </div>
-                  
                     <div class="single-input-wrap">
-                        <input type="password" placeholder="Password">
+                        <input type="password" name="password" placeholder="Password" required>
                     </div>
                     <div class="btn-wrap">
-                        <button class="btn btn-base w-100">Signin Now</button>
+                        <button class="btn btn-base w-100" type="submit">Signin Now</button>
                     </div>
                     <div class="bottom-content">
-                        <a href="#">Forgottem Your Password</a>
-                        <a class="strong" href="signup.html">Signup</a>
+                        <a href="#">Forgot Your Password?</a>
+                        <a class="strong" href="{{ route('register') }}">Signup</a>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
