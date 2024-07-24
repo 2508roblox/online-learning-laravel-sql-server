@@ -94,55 +94,71 @@
             </div>
             <div class="col-lg-12">
                 <ul class="edl-nav nav nav-pills">
+                    @php
+                        $categoryCount = 0;
+                    @endphp
                     @foreach($categories as $category)
-                    <li class="nav-item">
-                        <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="pills-{{ $category->CategoryID }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ $category->CategoryID }}">{{ $category->CategoryName }}</button>
-                    </li>
+                        @if ($categoryCount < 5)
+                            <li class="nav-item">
+                                <button class="nav-link {{ $categoryCount === 0 ? 'active' : '' }}" id="pills-{{ $category->CategoryID }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ $category->CategoryID }}">{{ $category->CategoryName }}</button>
+                            </li>
+                            @php
+                                $categoryCount++;
+                            @endphp
+                        @endif
                     @endforeach
                 </ul>
                 <div class="tab-content">
+                    @php
+                        $categoryCount = 0;
+                    @endphp
                     @foreach($categories as $category)
-                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="pills-{{ $category->CategoryID }}">
-                        <div class="course-slider owl-carousel">
-                            @foreach($courses as $course)
-                                @if ($course->CategoryID == $category->CategoryID)
-                                <div class="item">
-                                    <div class="single-course-wrap">
-                                        <div class="thumb">
-                                            <a href="#" class="cat cat-blue">{{ $course->Level }}</a>
-                                            <img src="{{ $course->ImageURL }}" alt="img">
-                                        </div>
-                                        <div class="wrap-details">
-                                            <h6><a href="#">{{ $course->Title }}</a></h6>
-                                            <div class="user-area">
-                                                <div class="user-details">
-                                                    <img src="{{ asset('client/img/author/' . $course->InstructorID . '.png') }}" alt="img">
-                                                    <a href="{{ route('instructor.show', ['id' =>  $course->InstructorID ]) }}">Jessica Jessy</a>
-                                                </div>
-                                                <div class="user-rating">
-                                                    <span><i class="fa fa-star"></i> {{ $course->Rating }}</span> ({{ $course->EnrolledLearner }})
-                                                </div>
+                        @if ($categoryCount < 5)
+                            <div class="tab-pane fade {{ $categoryCount === 0 ? 'show active' : '' }}" id="pills-{{ $category->CategoryID }}">
+                                <div class="course-slider owl-carousel">
+                                    @foreach($courses->where('CategoryID', $category->CategoryID) as $course)
+                                    <div class="item">
+                                        <div class="single-course-wrap">
+                                            <div class="thumb">
+                                                <a href="#" class="cat cat-blue">{{ $course->Level }}</a>
+                                                <img src="{{ asset('storage/' . $course->ImageURL) }}" alt="img">
+
                                             </div>
-                                            <div class="price-wrap">
-                                                <div class="row align-items-center">
-                                                    <div class="col-6">
-                                                        <a href="#">Development</a>
+                                            <div class="wrap-details">
+                                                <h6><a href="{{ route('course.preview', ['id' => $course->CourseID]) }}">{{ $course->Title }}</a></h6>
+                                                <div class="user-area">
+                                                    <div class="user-details">
+                                                        <img src="{{ asset('client/img/author/1' . '.png') }}" alt="img">
+                                                        <a href="{{ route('instructor.show', ['id' => $course->InstructorID]) }}">Jessica Jessy</a>
                                                     </div>
-                                                    <div class="col-6 text-end">
-                                                        <div class="price">${{ $course->Price }}</div>
+                                                    <div class="user-rating">
+                                                        <span><i class="fa fa-star"></i> {{ $course->Rating }}</span> ({{ $course->EnrolledLearner }})
+                                                    </div>
+                                                </div>
+                                                <div class="price-wrap">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-6">
+                                                            <a href="#">Development</a>
+                                                        </div>
+                                                        <div class="col-6 text-end">
+                                                            <div class="price">${{ $course->Price }}</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    @endforeach
                                 </div>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
+                            </div>
+                            @php
+                                $categoryCount++;
+                            @endphp
+                        @endif
                     @endforeach
                 </div>
             </div>
+
 
 
         </div>
@@ -202,14 +218,14 @@
                                 <div class="single-course-wrap">
                                     <div class="thumb">
                                         <a href="#" class="cat cat-blue">{{ $course->Level }}</a>
-                                        <img src="{{  $course->ImageURL   }}" alt="img">
+                                        <img src="{{ asset('storage/' . $course->ImageURL) }}" alt="img">
+
                                     </div>
                                     <div class="wrap-details">
                                         <h6><a href="#">{{ $course->Title }}</a></h6>
                                         <div class="user-area">
                                             <div class="user-details">
-                                                <img src="{{ asset('client/img/author/' . $course->InstructorID . '.png') }}" alt="img">
-                                                <a href="#">Jessica Jessy</a>
+                                                <img src="{{ asset('client/img/author/1' . '.png') }}" alt="img">                                                <a href="#">Jessica Jessy</a>
                                             </div>
                                             <div class="user-rating">
                                                 <span><i class="fa fa-star"></i> {{ $course->Rating }}</span> ({{ $course->EnrolledLearner }})

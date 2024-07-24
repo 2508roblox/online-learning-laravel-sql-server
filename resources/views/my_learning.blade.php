@@ -77,7 +77,8 @@
                                 <div class="thumb">
                                     <a href="#" class="cat cat-blue">{{ $course->Level }}</a>
                                     <a href="{{ route('course.preview', ['id' => $course->CourseID]) }}">
-                                        <img src="{{ asset('client/img/course/1.png') }}" alt="Course Image">
+                                        <img src="{{ asset('storage/' . $course->ImageURL) }}" alt="img">
+
                                     </a>
                                 </div>
                                 <div class="wrap-details">

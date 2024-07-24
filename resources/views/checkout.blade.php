@@ -1,11 +1,17 @@
 @extends('inc.layout')
 @section('content')
 
-    <!-- breabcrumb Area Start-->
+<section class="enllor-courses-area pd-top-120 pd-bottom-140">
+    <div class="container">
+        <!-- Display Success Message -->
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-
-    <section class="enllor-courses-area pd-top-120 pd-bottom-140">
-        <div class="container">
+        <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data">
+            @csrf
             <div class="row">
                 <!-- Left Column: Billing and Payment Information -->
                 <div class="col-md-7">
@@ -19,32 +25,34 @@
                                 <!-- Add other countries as needed -->
                             </select>
                         </div>
-                        <small style="font-size: .6rem" class="text-sm" >Udemy is required by law to collect applicable transaction taxes for purchases made in certain tax jurisdictions.</small>
+                        <small style="font-size: .6rem" class="text-sm">Udemy is required by law to collect applicable transaction taxes for purchases made in certain tax jurisdictions.</small>
                     </div>
-
 
                     <div class="payment-method p-3 mb-3" style="background-color: #f9f9f9; border-radius: 5px;">
                         <h4>Payment method</h4>
                         <div class="card">
                             <div class="card-body d-flex align-items-center">
-                                <img  src="https://i.gyazo.com/4914b35ab9381a3b5a1e7e998ee9550c.png" alt="VNPAY Logo" style="width: 40px; height: auto; margin-right: 15px;">
+                                <img src="https://i.gyazo.com/4914b35ab9381a3b5a1e7e998ee9550c.png" alt="VNPAY Logo" style="width: 40px; height: auto; margin-right: 15px;">
                                 <div>
                                     <h5 style="font-size: 1rem" class="card-title">VNPAY</h5>
                                     <small class="card-text">Secure online payment via VNPAY</small>
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" name="payment_method" value="VNPAY">
                     </div>
 
                     <div class="order-details p-3 mb-3" style="background-color: #f9f9f9; border-radius: 5px;">
                         <h4>Order details</h4>
                         <div class="order-item d-flex align-items-center">
-                            <img src="{{ $course->ImageURL }}" alt="Course Image" class="img-thumbnail" style="width: 100px; height: auto; margin-right: 15px;">
+                            <img src="{{ asset('storage/' . $course->ImageURL) }}" alt="Course Image" class="img-thumbnail" style="width: 100px; height: auto; margin-right: 15px;">
                             <div>
                                 <p>{{ $course->Title }}</p>
                                 <p>{{ number_format($course->Price, 2) }}$</p>
                             </div>
                         </div>
+                        <input type="hidden" name="course_id" value="{{ $course->CourseID }}">
+                        <input type="hidden" name="course_price" value="{{ $course->Price }}">
                     </div>
                 </div>
 
@@ -62,7 +70,7 @@
                     </div>
                     <hr>
                     <p>By completing your purchase you agree to these Terms of Service.</p>
-                    <button class="btn btn-primary btn-block mb-3">Checkout</button>
+                    <button type="submit" class="btn btn-primary btn-block mb-3">Checkout</button>
                     <p class="money-back-guarantee">30-Day Money-Back Guarantee</p>
                 </div>
                 <style>
@@ -83,7 +91,8 @@
                     }
                 </style>
             </div>
-        </div>
-    </section>
+        </form>
+    </div>
+</section>
 
 @endsection

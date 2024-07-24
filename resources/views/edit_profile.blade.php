@@ -40,7 +40,7 @@
             <div class="tab-content" id="profileTabContent">
                 <!-- Basic Information Tab -->
                 <div class="tab-pane fade show active" id="basic-info" role="tabpanel" aria-labelledby="basic-info-tab">
-                    <form action=" " method="POST" class="mt-4">
+                    <form action="{{ route('learner.profile.update') }}" method="POST" class="mt-4">
                         @csrf
                         @method('PUT')
                         <div class="row">
@@ -56,15 +56,14 @@
                                     <input type="email" id="Email" name="Email" class="form-control" value="{{ old('Email', Auth::user()->Email ?? null) }}" required>
                                 </div>
                             </div>
-
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="Gender">Gender:</label>
                                     <select id="Gender" name="Gender" class="form-control" required>
-                                        <option value="Male" {{ Auth::user()->Gender ?? null == 'Male' ? 'selected' : '' }}>Male</option>
-                                        <option value="Female" {{ Auth::user()->Gender ?? null == 'Female' ? 'selected' : '' }}>Female</option>
+                                        <option value="M" {{ Auth::user()->Gender ?? null == 'Male' ? 'selected' : '' }}>Male</option>
+                                        <option value="F" {{ Auth::user()->Gender ?? null == 'Female' ? 'selected' : '' }}>Female</option>
                                     </select>
                                 </div>
                             </div>
@@ -89,6 +88,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
+
                     <style>
                         .form-group {
                             margin-bottom: 15px;
@@ -110,34 +110,43 @@
                 </div>
                 <!-- Change Password Tab -->
                 <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="change-password-tab">
-                    <form action=" " method="POST" class="mt-4">
+                    <form action="{{ route('user.change.password') }}" method="POST" class="mt-4">
                         @csrf
                         @method('PUT')
+
                         <div class="form-group">
                             <label for="current_password">Current Password:</label>
                             <input type="password" id="current_password" name="current_password" class="form-control" required>
                         </div>
+
                         <div class="form-group">
                             <label for="new_password">New Password:</label>
                             <input type="password" id="new_password" name="new_password" class="form-control" required>
                         </div>
+
                         <div class="form-group">
                             <label for="new_password_confirmation">Confirm New Password:</label>
                             <input type="password" id="new_password_confirmation" name="new_password_confirmation" class="form-control" required>
                         </div>
+
                         <button type="submit" class="btn btn-primary">Change Password</button>
                     </form>
                 </div>
                 <!-- Profile Picture Tab -->
                 <div class="tab-pane fade" id="profile-picture" role="tabpanel" aria-labelledby="profile-picture-tab">
-                    <form action=" " method="POST" enctype="multipart/form-data" class="mt-4">
+                    <form action="{{ route('user.update.profile.picture') }}" method="POST" enctype="multipart/form-data" class="mt-4">
                         @csrf
                         @method('PUT')
                         <div class="form-group">
-                            @if (Auth::user()->ProfilePicture ?? true)
+                            @if (Auth::user()->ProfilePicture)
                             <div class="mt-2">
                                 <p>Image Preview:</p>
-                                <img id="imagePreview" width="300px" src="{{ Auth::user()->ProfilePicture ?? 'https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/anh-den-ngau.jpeg' }}" alt="Current Avatar" class="img-thumbnail">
+                                <img id="imagePreview" width="300px" src="{{ Auth::user()->ProfilePicture }}" alt="Current Avatar" class="img-thumbnail">
+                            </div>
+                            @else
+                            <div class="mt-2">
+                                <p>Image Preview:</p>
+                                <img id="imagePreview" width="300px" src="https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/anh-den-ngau.jpeg" alt="Default Avatar" class="img-thumbnail">
                             </div>
                             @endif
                             <label for="ProfilePicture" class="mt-2">Profile Picture:</label>
@@ -145,6 +154,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Update Picture</button>
                     </form>
+
                 </div>
                 <style>
                     .form-group {

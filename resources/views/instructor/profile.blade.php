@@ -1,11 +1,6 @@
-
 @extends('instructor.inc.layout')
+
 @section('content')
-
-
-
-
-
 <section class="admin-dashboard-section">
     <div class="admin-dashboard-right-side">
         <!-- top header start  -->
@@ -14,9 +9,9 @@
                 <div class="row">
                     <div class="col-xl-6">
                         <span class="header-user">
-                            <a href="#"><img src="{{asset('instructor/img/author/02.png')}}" alt="img"></a>
+                            <a href="#"><img style="width: 100px;" src="{{ $instructor->ProfilePicture }}" alt="Profile Picture"></a>
                             <span>Hello,
-                                <h5>Ramjan Ali Anik</h5>
+                                <h5>{{ $instructor->FullName }}</h5>
                             </span>
                         </span>
                     </div>
@@ -45,19 +40,19 @@
             <h5 class="dashboard-title">My Profile</h5>
             <a class="edit-btn" href="#"><i class="fa fa-pencil-alt me-2"></i>Edit</a>
             <ul>
-                <li><span>Registration Date</span>Faiday, 20 Dec 2020, 10:00 AM</li>
-                <li><span>First Name</span>Ramjan Ali</li>
-                <li><span>Last Name</span>Anik</li>
-                <li><span>Uasername</span>ramjanalianik</li>
-                <li><span>Email</span>demo@email.com</li>
-                <li><span>Phone Number</span>+123 12 24 567</li>
-                <li><span>Skil/Occupation</span>UX Designer & Web Developer</li>
-                <li><span>Bio</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Auctor laoreet ornare morbi tortor in quis enim integer. Massa et mus odio adipiscing lectus arcu rutrum odio id. Lobortis turpis ligula lobortis ullamcorper sem luctus. Interdum sit quam dictum at mauris.</li>
+                <li><span>Registration Date</span>{{ \Carbon\Carbon::parse($instructor->CreatedAt)->format('l, d M Y, h:i A') }}</li>
+                <li><span>Full Name</span>{{ $instructor->FullName }}</li>
+                <li><span>Username</span>{{ $instructor->Username }}</li>
+                <li><span>Email</span>{{ $instructor->Email }}</li>
+                <li><span>Phone Number</span>{{ $instructor->Phone }}</li>
+                <li><span>Address</span>{{ $instructor->Address }}</li>
+                <li><span>Instructor Type</span>{{ ucfirst($instructor->InstructorType) }}</li>
+                <li><span>Scientific Background</span>{{ $instructor->ScientificBackground }}</li>
+                <li><span>Degrees</span>{{ $instructor->Degrees }}</li>
             </ul>
         </div>
     </div>
     <!-- dashboard-left-menu start  -->
     @include('instructor.inc.sidebar')
-
 </section>
-    @endsection
+@endsection

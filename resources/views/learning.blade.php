@@ -70,17 +70,83 @@
         <div class=" " style="width: 100%">
             <div class="row">
                 <div class="col-lg-8">
+                    @if (!empty($video->Content))
                     <div class="single-course-wrap mb-0">
                         <div class="thumb">
-                            <video controls style="
-                            width: 100%;
-                        ">
-                                <source src="{{ asset('client/video/test.mkv') }}" type="video/mp4">
+                            <video controls style="width: 100%;">
+                                <source src="{{ $video->Content }}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                         </div>
-
                     </div>
+
+                @endif
+                <div class="single-course-wrap mb-0 " style="padding: 1rem">
+                    @if (!empty($quiz))
+                    <div id="quiz-questions">
+                        @foreach ($quiz as $index => $question)
+                            <div class="quiz-question card mb-3 p-3" data-question="{{ $index }}" style="display: {{ $index == 0 ? 'block' : 'none' }};">
+                                <h4 class="card-title">Question {{ $index + 1 }}: {{ $question->Question }}</h4>
+                                @php
+                                    $choices = json_decode($question->Choices);
+                                @endphp
+                                @if ($choices)
+                                    <ul class="list-group list-group-flush">
+                                        @foreach ($choices as $choice)
+                                            <li class="list-group-item">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="question{{ $index }}" id="choice{{ $loop->index }}" value="{{ $choice->Answer }}">
+                                                    <label class="form-check-label" for="choice{{ $loop->index }}">
+                                                        {{ $choice->Answer }}
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="quiz-navigation mt-3">
+                        <button id="prev-question" class="btn btn-secondary" disabled>Previous</button>
+                        <button id="next-question" class="btn btn-primary">Next</button>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const questions = document.querySelectorAll('.quiz-question');
+                            const prevButton = document.getElementById('prev-question');
+                            const nextButton = document.getElementById('next-question');
+                            let currentQuestion = 0;
+
+                            prevButton.addEventListener('click', function () {
+                                if (currentQuestion > 0) {
+                                    questions[currentQuestion].style.display = 'none';
+                                    currentQuestion--;
+                                    questions[currentQuestion].style.display = 'block';
+                                    updateNavigationButtons();
+                                }
+                            });
+
+                            nextButton.addEventListener('click', function () {
+                                if (currentQuestion < questions.length - 1) {
+                                    questions[currentQuestion].style.display = 'none';
+                                    currentQuestion++;
+                                    questions[currentQuestion].style.display = 'block';
+                                    updateNavigationButtons();
+                                }
+                            });
+
+                            function updateNavigationButtons() {
+                                prevButton.disabled = currentQuestion === 0;
+                                nextButton.disabled = currentQuestion === questions.length - 1;
+                            }
+
+                            updateNavigationButtons();
+                        });
+                    </script>
+                @endif
+                </div>
+
                     <ul class="course-tab nav nav-pills pt-5 px-5">
                         <!-- Overview tab (active by default) -->
                         <li class="nav-item">
@@ -183,41 +249,49 @@
                             @php
                                 $sections = collect($course)->groupBy('SectionID');
                             @endphp
-                            @foreach($sections as $sectionID => $sectionItems)
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="heading{{ $sectionID }}">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $sectionID }}" aria-expanded="false" aria-controls="collapse{{ $sectionID }}">
-                                            {{ $sectionItems->first()->SectionTitle }}
-                                        </button>
-                                    </h2>
-                                    <div id="collapse{{ $sectionID }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $sectionID }}" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            <ul>
-                                                @foreach($sectionItems as $item)
 
-                                                    <li class="curriculum-item p-1 cursor-pointer">
-                                                        <a   href="index.html" >
-                                                            <i class="fa fa-play"></i>
-                                                        </a>
-                                                        <span>
-                                                            <p>{{ $item->CurriculumItemTitle }}</p>
-                                                            <span>
-                                                                @if ($item->CurriculumItemType == 'Q')
-                                                                    Quiz
-                                                                @elseif ($item->CurriculumItemType == 'A')
-                                                                    Assignment
-                                                                @elseif ($item->CurriculumItemType == 'V')
-                                                                    Video
-                                                                @endif
-                                                            </span>
-                                                        </span>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+@foreach($sections as $sectionID => $sectionItems)
+<div class="accordion-item active">
+    <h2 class="accordion-header" id="heading{{ $sectionID }}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $sectionID }}" aria-expanded="true" aria-controls="collapse{{ $sectionID }}">
+            {{ $sectionItems->first()->SectionTitle }}
+        </button>
+    </h2>
+    <div id="collapse{{ $sectionID }}" class="accordion-collapse collapse show" aria-labelledby="heading{{ $sectionID }}" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <ul class="list-unstyled">
+                @foreach($sectionItems as $item)
+                <a href="
+                    @if ($item->CurriculumItemType == 'Q')
+                        {{ route('learning.quiz', ['course_id' => $course[0]->CourseID, 'item_id' => $item->CurriculumItemID]) }}
+                    @elseif ($item->CurriculumItemType == 'A')
+                        {{ route('learning.assignment', ['course_id' => $course[0]->CourseID, 'item_id' => $item->CurriculumItemID]) }}
+                    @elseif ($item->CurriculumItemType == 'L')
+                        {{ route('learning.video', ['course_id' => $course[0]->CourseID, 'item_id' => $item->CurriculumItemID]) }}
+                    @endif
+" class="curriculum-item p-1 d-block cursor-pointer {{ $item->CurriculumItemID == ($current_item ?? 0) ? 'active' : '' }}">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-play me-2"></i>
+                        <div>
+                            <p>{{ $item->CurriculumItemTitle }}</p>
+                            <span>
+                                @if ($item->CurriculumItemType == 'Q')
+                                    Quiz
+                                @elseif ($item->CurriculumItemType == 'A')
+                                    Assignment
+                                @elseif ($item->CurriculumItemType == 'L')
+                                    Video
+                                @endif
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            @endforeach
+            </ul>
+        </div>
+    </div>
+</div>
+@endforeach
                         </div>
 
                     </div>
@@ -247,10 +321,7 @@
     background-color: #f2f2f2; /* Màu nền khi hover */
 }
 
-.curriculum-item:hover p,
-.curriculum-item:hover span {
-    color: #666; /* Đổi màu chữ khi hover */
-}
+
 
 </style>
 <!-- all plugins here -->
@@ -292,5 +363,18 @@
 });
 
 </script>
+<style>
+
+    .curriculum-item:hover {
+        background-color: #f9f9f9; /* Light background on hover */
+        cursor: pointer; /* Pointer cursor on hover */
+    }
+
+    .curriculum-item.active {
+        background-color: #e0f7fa; /* Highlight background for active item */
+        font-weight: bold; /* Make text bold for active item */
+    }
+</style>
+
 </body>
 </html>

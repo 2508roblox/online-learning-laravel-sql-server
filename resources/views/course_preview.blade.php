@@ -13,14 +13,15 @@
                 <div class="single-course-wrap mb-0">
                     <div class="thumb">
                         <a class="play-btn" href="#"><i class="fa fa-play"></i></a>
-                        <img src="{{asset('client/img/course/video.png')}}" alt="img">
+                        <img src="{{ asset('storage/' . $course[0]->ImageURL) }}" alt="img">
                     </div>
                     <div class="wrap-details">
                         <h5><a href="#">{{ $course[0]->Title }}</a></h5>
                         <p>{{ $course[0]->Description }}</p>
                         <div class="user-area">
                             <div class="user-details">
-                                <img src="{{ asset('client/img/author/' . $course[0]->InstructorID . '.png') }}" alt="img">
+                                <img style="width: 50px;" src="{{ asset( $course[0]->ProfilePicture ) }}" alt="img">
+
                                 <a href="{{ route('instructor.show', ['id' =>  $course[0]->InstructorID ]) }}">{{ $course[0]->InstructorName }}</a>
                             </div>
                             <div class="date ms-auto">
@@ -50,8 +51,11 @@
                                 <a class="ms-4" href="#"><i class="fa fa-share me-2"></i>share</a>
                             </div>
 
-
-                            <a class="btn btn-base ms-auto" href="{{ route('checkout', ['course_id' => $course[0]->CourseID]) }}">Enroll Now </a>
+                            @if ($course[0]->HasPurchased == 1)
+                            <a class="btn btn-base ms-auto" href="{{ route('learning.course', ['course_id' => $course[0]->CourseID]) }}">Learn Now</a>
+                        @else
+                            <a class="btn btn-base ms-auto" href="{{ route('checkout', ['course_id' => $course[0]->CourseID]) }}">Enroll Now</a>
+                        @endif
                         </div>
                     </div>
                 </div>
