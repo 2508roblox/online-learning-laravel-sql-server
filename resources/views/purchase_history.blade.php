@@ -42,7 +42,7 @@
                         <td>{{ $payment->TotalDiscount ? $payment->TotalDiscount : 'No discount available' }}</td>
                         <td>{{ $payment->Status }}</td>
                         <td>
-                            <a href="{{ route('view.receipt', ['payment_id' => $payment->PaymentID]) }}" class="btn btn-info">Receipt</a>
+                            <a   class="btn btn-info">Receipt</a>
                         </td>
                     </tr>
                 @endforeach

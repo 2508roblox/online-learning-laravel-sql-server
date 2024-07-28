@@ -42,9 +42,9 @@
             $(this).tab('show');
         });
 
-        let requirementCounter = {{ count($requirements) }};
-        let learningObjectiveCounter = {{ count($learningObjectives) }};
-        let intendedLearnerCounter = {{ count($intendedLearners) }};
+        let requirementCounter = {{ isset($requirements) && is_array($requirements) ? count($requirements) : 0 }};
+        let learningObjectiveCounter = {{ isset($learningObjectives) && is_array($learningObjectives) ? count($learningObjectives) : 0 }};
+        let intendedLearnerCounter = {{ isset($intendedLearners) && is_array($intendedLearners) ? count($intendedLearners) : 0 }};
 
         // Add new requirement input
         $('#add-requirement').click(function() {
@@ -94,37 +94,105 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 </script>
-                        </ul>
+            </ul>
                         <div class="tab-content mt-3">
                             <!-- Requirements Tab -->
                             <div class="tab-pane fade show active" id="requirements" role="tabpanel" aria-labelledby="requirements-tab">
                                 <div id="requirements-fields">
-                                    @foreach($requirements as $requirement)
+                                    @forelse(($requirements ?? []) as $requirement)
                                     <div class="form-group mt-3">
-                                        <input type="text" class="form-control" name="requirement[]" value="{{ $requirement }}" rows="4" required></input>
+                                        <input type="text" class="form-control" name="requirement[]" value="{{ $requirement }}" rows="4" required>
                                     </div>
-                                    @endforeach
+                                    @empty
+                                    <div class="form-group mt-3">
+                                        <input type="text" class="form-control" name="requirement[]" value="" rows="4" required>
+                                    </div>
+                                    @endforelse
                                 </div>
                                 <button type="button" class="btn btn-secondary mt-3" id="add-requirement">+</button>
 
                                 <div id="intendedLearner-fields">
-                                    @foreach($intendedLearners as $learner)
+                                    @forelse(($intendedLearners ?? []) as $learner)
                                     <div class="form-group mt-3">
-                                        <input type="text" class="form-control" name="intendedLearner[]" value="{{ $learner }}" rows="4" required></input>
+                                        <input type="text" class="form-control" name="intendedLearner[]" value="{{ $learner }}" rows="4" required>
                                     </div>
-                                    @endforeach
+                                    @empty
+                                    <div class="form-group mt-3">
+                                        <input type="text" class="form-control" name="intendedLearner[]" value="" rows="4" required>
+                                    </div>
+                                    @endforelse
                                 </div>
                                 <button type="button" class="btn btn-secondary mt-3" id="add-intendedLearner">+</button>
 
                                 <div id="learning-objectives-fields">
-                                    @foreach($learningObjectives as $objective)
+                                    @forelse(($learningObjectives ?? []) as $objective)
                                     <div class="form-group mt-3">
-                                        <input type="text" class="form-control" name="learning_objective[]" value="{{ $objective }}" rows="4" required></input>
+                                        <input type="text" class="form-control" name="learning_objective[]" value="{{ $objective }}" rows="4" required>
                                     </div>
-                                    @endforeach
+                                    @empty
+                                    <div class="form-group mt-3">
+                                        <input type="text" class="form-control" name="learning_objective[]" value="" rows="4" required>
+                                    </div>
+                                    @endforelse
                                 </div>
                                 <button type="button" class="btn btn-secondary mt-3" id="add-learning-objective">+</button>
                             </div>
+
+                            <script>
+                                $(document).ready(function() {
+                                    let requirementCounter = {{ isset($requirements) && is_array($requirements) ? count($requirements) : 0 }};
+                                    let learningObjectiveCounter = {{ isset($learningObjectives) && is_array($learningObjectives) ? count($learningObjectives) : 0 }};
+                                    let intendedLearnerCounter = {{ isset($intendedLearners) && is_array($intendedLearners) ? count($intendedLearners) : 0 }};
+
+                                    // Add new requirement input
+                                    $('#add-requirement').click(function() {
+                                        requirementCounter++;
+                                        $('#requirements-fields').append(`
+                                            <div class="form-group mt-3" id="requirement-field-${requirementCounter}">
+                                                <input type="text" class="form-control" name="requirement[field${requirementCounter}]" rows="4" required>
+                                                <button type="button" class="btn btn-danger mt-2" onclick="removeField('requirement-field-${requirementCounter}')">Remove</button>
+                                            </div>
+                                        `);
+                                    });
+
+                                    // Add new learning objective input
+                                    $('#add-learning-objective').click(function() {
+                                        learningObjectiveCounter++;
+                                        $('#learning-objectives-fields').append(`
+                                            <div class="form-group mt-3" id="learning-objective-field-${learningObjectiveCounter}">
+                                                <input type="text" class="form-control" name="learning_objective[field${learningObjectiveCounter}]" rows="4" required>
+                                                <button type="button" class="btn btn-danger mt-2" onclick="removeField('learning-objective-field-${learningObjectiveCounter}')">Remove</button>
+                                            </div>
+                                        `);
+                                    });
+
+                                    // Add new intended learner input
+                                    $('#add-intendedLearner').click(function() {
+                                        intendedLearnerCounter++;
+                                        $('#intendedLearner-fields').append(`
+                                            <div class="form-group mt-3" id="intendedLearner-field-${intendedLearnerCounter}">
+                                                <input type="text" class="form-control" name="intendedLearner[field${intendedLearnerCounter}]" rows="4" required>
+                                                <button type="button" class="btn btn-danger mt-2" onclick="removeField('intendedLearner-field-${intendedLearnerCounter}')">Remove</button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+
+                                function removeField(fieldId) {
+                                    $(`#${fieldId}`).remove();
+                                }
+
+                                function previewImage(event) {
+                                    var reader = new FileReader();
+                                    reader.onload = function() {
+                                        var output = document.getElementById('image-preview');
+                                        output.src = reader.result;
+                                        output.style.display = 'block';
+                                    };
+                                    reader.readAsDataURL(event.target.files[0]);
+                                }
+                            </script>
+
 
                             <!-- Details Tab -->
                             <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">

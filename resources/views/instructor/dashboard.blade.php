@@ -48,60 +48,42 @@
                     <div class="dashboard-area">
                         <h5 class="dashboard-title">Dashboard</h5>
                         <div class="row">
+                            @if ($instructorStatistics && count($instructorStatistics) > 0)
+                            @php $stats = $instructorStatistics[0]; @endphp
                             <div class="col-lg-4">
                                 <div class="single-dashboard-inner">
-                                    <img src="{{asset('instructor/img/icon/open-book')}}.png" alt="img">
+                                    <img src="{{ asset('instructor/img/icon/open-book.png') }}" alt="img">
                                     <div class="media-body">
-                                        <h4>12</h4>
-                                        <p>Enrolled Courses</p>
+                                        <h4>{{ $stats->TotalLearners }}</h4>
+                                        <p>Total Students</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="single-dashboard-inner">
-                                    <img src="{{asset('instructor/img/icon/open-book')}}.png" alt="img">
+                                    <img src="{{ asset('instructor/img/icon/open-book.png') }}" alt="img">
                                     <div class="media-body">
-                                        <h4>6</h4>
-                                        <p>Active Courses</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="single-dashboard-inner">
-                                    <img src="{{asset('instructor/img/icon/open-book')}}.png" alt="img">
-                                    <div class="media-body">
-                                        <h4>1</h4>
-                                        <p>Completed Courses</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="single-dashboard-inner">
-                                    <img src="{{asset('instructor/img/icon/open-book')}}.png" alt="img">
-                                    <div class="media-body">
-                                        <h4>12,273</h4>
-                                        <p>Total Student</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="single-dashboard-inner">
-                                    <img src="{{asset('instructor/img/icon/open-book')}}.png" alt="img">
-                                    <div class="media-body">
-                                        <h4>10</h4>
+                                        <h4>{{ $stats->TotalCourses }}</h4>
                                         <p>Total Courses</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="single-dashboard-inner">
-                                    <img src="{{asset('instructor/img/icon/open-book')}}.png" alt="img">
+                                    <img src="{{ asset('instructor/img/icon/open-book.png') }}" alt="img">
                                     <div class="media-body">
-                                        <h4>$1,232</h4>
+                                        <h4>${{ number_format($stats->TotalRevenue, 2) }}</h4>
                                         <p>Total Earnings</p>
                                     </div>
                                 </div>
                             </div>
+                        @else
+                            <div class="col-lg-12">
+                                <div class="alert alert-warning">
+                                    No statistics available.
+                                </div>
+                            </div>
+                        @endif
                         </div>
                     </div>
                     <!-- dashboard-area end  -->

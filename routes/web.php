@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-
 Route::get('/instructor/dashboard', function () {
-    return view('instructor.dashboard');
+    // Get the authenticated user's ID
+    $userID = Auth::id();
+
+    // Execute the stored procedure with UserID to get instructor statistics
+    $instructorStatistics = DB::select('EXEC GetInstructorStatisticsByUserId ?', [$userID]);
+    return view('instructor.dashboard', compact('instructorStatistics'));
 })->name('instructor.dashboard');
 
 Route::get('/instructor/courses', function () {
@@ -677,7 +681,6 @@ Route::get('/purchase-history', function () {
     // Retrieve courses and categories
     $courses = DB::select('EXEC GetCoursesWithDetails');
     $categories = DB::select('EXEC GetCategoriesWithCourseCountByTopic');
-    dd( $paymentHistory);
     return view('purchase_history', compact('paymentHistory', 'courses', 'categories'));
 })->name('purchase.history');
 
@@ -726,7 +729,7 @@ Route::get('/learning/{course_id}/curriculum/{curriculum_id}', function ($course
 // Route để hiển thị form tạo curriculum cho một khóa học
 Route::get('/instructor/courses/{courseId}/curriculum/create', function ($courseId) {
     // Gọi stored procedure để lấy chi tiết khóa học
-    $courseDetails = DB::select('EXEC [dbo].[GetCourseDetailsById] @CourseID = ?', [$courseId]);
+    $courseDetails = DB::select('EXEC [dbo].[GetCourseDetailsById]   ?, ?', [$courseId, 0]);
 
     if (empty($courseDetails)) {
         return redirect()->route('instructor.courses')->with('error', 'Course not found.');
